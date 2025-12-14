@@ -36,15 +36,19 @@ export class ChunkingService {
    * 텍스트 배열을 Document 객체로 변환 후 분할
    *
    * @param texts - 분할할 텍스트 배열
+   * @param metadata - 메타데이터 배열 (텍스트와 동일한 길이)
    * @returns 분할된 문서 배열
    */
-  async splitTexts(texts: string[]): Promise<Document[]> {
+  async splitTexts(
+    texts: string[],
+    metadata?: Record<string, any>[],
+  ): Promise<Document[]> {
     // 텍스트를 Document 객체로 변환
     const documents = texts.map(
-      (text) =>
+      (text, index) =>
         new Document({
           pageContent: text,
-          metadata: {},
+          metadata: metadata?.[index] || {},
         }),
     );
 

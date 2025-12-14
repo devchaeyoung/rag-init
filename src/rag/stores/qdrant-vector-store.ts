@@ -90,12 +90,12 @@ export class QdrantVectorStore extends VectorStore {
     // 벡터 포인트 생성
     // 각 문서를 Qdrant 포인트 형식으로 변환
     const points = documents.map((doc, index) => {
-      // 고유 ID 생성 (타임스탬프 + 인덱스)
-      const id = `${Date.now()}-${index}`;
-      ids.push(id);
+      // 고유 ID 생성 (숫자 ID 사용)
+      const id = Date.now() * 1000 + index;
+      ids.push(id.toString());
 
       return {
-        id,
+        id, // 숫자 ID
         vector: embeddings[index], // 임베딩 벡터
         payload: {
           pageContent: doc.pageContent, // 원본 텍스트
@@ -104,11 +104,24 @@ export class QdrantVectorStore extends VectorStore {
       };
     });
 
-    // Qdrant에 업로드 (wait: true로 동기 처리)
-    await this.client.upsert(this.collectionName, {
-      wait: true,
-      points,
-    });
+    // 배치 크기 제한 (한 번에 너무 많은 문서를 보내지 않음)
+    const batchSize = 100;
+    for (let i = 0; i < points.length; i += batchSize) {
+      const batch = points.slice(i, i + batchSize);
+      
+      // Qdrant에 업로드 (wait: true로 동기 처리)
+      await this.client.upsert(this.collectionName, {
+        wait: true,
+        points: batch,
+      });
+      
+      console.log(`📦 배치 업로드 완료: ${i + batch.length}/${points.length}`);
+      
+      // 과도한 요청 방지를 위한 짧은 대기
+      if (i + batchSize < points.length) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
 
     return ids;
   }

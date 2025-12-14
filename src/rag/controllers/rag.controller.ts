@@ -143,4 +143,49 @@ export class RagController {
       return { error: error.message };
     }
   }
+
+  /**
+   * 디렉토리의 모든 문서 인덱싱
+   * 
+   * POST /rag/index-directory
+   * 
+   * 요청 본문:
+   * {
+   *   "dirPath": "rag-docs",
+   *   "recursive": true  // 선택, 기본값: true
+   * }
+   * 
+   * 응답:
+   * {
+   *   "success": true,
+   *   "filesProcessed": 11,
+   *   "message": "11개 파일이 성공적으로 인덱싱되었습니다."
+   * }
+   * 
+   * 지정된 디렉토리의 모든 파일을 읽어서 벡터 스토어에 추가합니다.
+   * JSON, PDF, TXT, MD 등 다양한 형식을 지원합니다.
+   */
+  @Post('index-directory')
+  async indexDirectory(
+    @Body() body: { dirPath: string; recursive?: boolean },
+  ) {
+    try {
+      const recursive = body.recursive !== undefined ? body.recursive : true;
+      const filesProcessed = await this.ragService.loadDocumentsFromDirectory(
+        body.dirPath,
+        recursive,
+      );
+
+      return {
+        success: true,
+        filesProcessed,
+        message: `${filesProcessed}개 파일이 성공적으로 인덱싱되었습니다.`,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
 }

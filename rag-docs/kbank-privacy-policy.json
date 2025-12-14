@@ -10,11 +10,7 @@
     "author": "개인정보보호팀 김지수",
     "reviewer": "개인정보보호책임자 이정민",
     "approver": "대표이사 이정민",
-    "certifications": [
-      "ISMS-P",
-      "ISO27001",
-      "PCI-DSS"
-    ],
+    "certifications": ["ISMS-P", "ISO27001", "PCI-DSS"],
     "compliance_laws": [
       "개인정보보호법",
       "정보통신망법",
@@ -23,7 +19,7 @@
       "신용정보법"
     ]
   },
-  
+
   "contact": {
     "privacy_officer": {
       "name": "이정민",
@@ -40,14 +36,12 @@
     },
     "privacy_policy_url": "https://www.kbanknow.com/privacy"
   },
-  
+
   "account_security": {
     "password_policy": {
       "min_length": 6,
       "max_length": 6,
-      "required_characters": [
-        "숫자"
-      ],
+      "required_characters": ["숫자"],
       "special_chars_allowed": false,
       "allowed_special_chars": "",
       "consecutive_char_limit": 3,
@@ -60,11 +54,7 @@
       "reuse_prevention_count": 5,
       "initial_password_method": "사용자 직접 설정",
       "force_change_on_first_login": false,
-      "password_reset_method": [
-        "본인인증",
-        "SMS 인증",
-        "영상통화 확인"
-      ]
+      "password_reset_method": ["본인인증", "SMS 인증", "영상통화 확인"]
     },
     "login_security": {
       "max_login_attempts": 5,
@@ -77,17 +67,11 @@
     "multi_factor_authentication": {
       "enabled": true,
       "required": true,
-      "methods": [
-        "생체인증",
-        "PIN",
-        "패턴",
-        "SMS",
-        "보안카드"
-      ],
+      "methods": ["생체인증", "PIN", "패턴", "SMS", "보안카드"],
       "applicable_to": "전체 사용자 (필수)"
     }
   },
-  
+
   "data_collection": {
     "required_fields": [
       "이름",
@@ -98,9 +82,7 @@
       "소득정보",
       "계좌번호"
     ],
-    "optional_fields": [
-      "이메일"
-    ],
+    "optional_fields": ["이메일"],
     "auto_collected_fields": [
       "IP 주소",
       "쿠키",
@@ -126,7 +108,7 @@
     ],
     "consent_method": "전자적 동의 (필수 동의)"
   },
-  
+
   "data_retention": {
     "retention_periods": [
       {
@@ -170,7 +152,7 @@
       "destruction_after_years": 5
     }
   },
-  
+
   "security_measures": {
     "encryption": {
       "storage": {
@@ -224,27 +206,20 @@
       "penetration_test_frequency": "분기 1회"
     }
   },
-  
+
   "third_party": {
     "data_sharing": [
       {
         "recipient": "신용정보회사",
         "purpose": "신용조회, 대출심사",
-        "items": [
-          "이름",
-          "주민등록번호",
-          "신용정보"
-        ],
+        "items": ["이름", "주민등록번호", "신용정보"],
         "retention_period": "5년",
         "consent_required": true
       },
       {
         "recipient": "금융결제원",
         "purpose": "계좌이체, 입출금",
-        "items": [
-          "이름",
-          "계좌번호"
-        ],
+        "items": ["이름", "계좌번호"],
         "retention_period": "거래 완료 후 5년",
         "consent_required": true
       }
@@ -253,81 +228,52 @@
       {
         "processor": "AWS",
         "task": "클라우드 인프라",
-        "items": [
-          "전체 개인정보"
-        ],
+        "items": ["전체 개인정보"],
         "retention_period": "위탁 계약 종료 시까지"
       },
       {
         "processor": "나이스평가정보",
         "task": "본인인증",
-        "items": [
-          "이름",
-          "생년월일",
-          "휴대전화번호"
-        ],
+        "items": ["이름", "생년월일", "휴대전화번호"],
         "retention_period": "인증 완료 후 즉시 삭제"
       }
     ],
     "international_transfer": {
       "enabled": true,
-      "countries": [
-        "미국"
-      ],
-      "recipients": [
-        "AWS"
-      ],
+      "countries": ["미국"],
+      "recipients": ["AWS"],
       "purpose": "클라우드 서비스",
-      "items": [
-        "서비스 이용 데이터"
-      ],
+      "items": ["서비스 이용 데이터"],
       "retention_period": "서비스 이용 기간",
       "consent_method": "별도 동의"
     }
   },
-  
+
   "user_rights": {
     "access_request": {
-      "methods": [
-        "앱 내 설정",
-        "고객센터"
-      ],
+      "methods": ["앱 내 설정", "고객센터"],
       "contact": "privacy@kbanknow.com",
       "processing_days": 10,
       "fee": 0,
       "identification_required": true
     },
     "correction_deletion": {
-      "methods": [
-        "앱 내 설정",
-        "고객센터"
-      ],
+      "methods": ["앱 내 설정", "고객센터"],
       "processing_days": 10,
-      "limitations": [
-        "은행법 보존 의무",
-        "전자금융거래법 보존 의무"
-      ]
+      "limitations": ["은행법 보존 의무", "전자금융거래법 보존 의무"]
     },
     "processing_suspension": {
-      "methods": [
-        "고객센터"
-      ],
+      "methods": ["고객센터"],
       "processing_days": 10,
-      "rejection_reasons": [
-        "법적 의무",
-        "금융거래"
-      ]
+      "rejection_reasons": ["법적 의무", "금융거래"]
     },
     "consent_withdrawal": {
-      "methods": [
-        "앱 > 설정 > 계좌 해지",
-        "고객센터"
-      ],
+      "methods": ["앱 > 설정 > 계좌 해지", "고객센터"],
       "effective_immediately": true,
       "post_withdrawal_action": "법정 보관 의무 제외 즉시 파기"
     }
   },
-  
+
   "breach_response": {
     "monitoring": "24시간 365일",
     "response_team": "보안팀, 개인정보보호팀, 법무팀",
@@ -340,11 +286,7 @@
     ],
     "user_notification": {
       "timing_hours": 24,
-      "methods": [
-        "앱 푸시",
-        "SMS",
-        "이메일"
-      ]
+      "methods": ["앱 푸시", "SMS", "이메일"]
     },
     "authority_notification": {
       "authorities": [
@@ -361,14 +303,11 @@
       "개인정보 분쟁조정위원회"
     ]
   },
-  
+
   "cookies_tracking": {
     "cookies": {
       "enabled": true,
-      "purposes": [
-        "로그인 유지",
-        "보안"
-      ],
+      "purposes": ["로그인 유지", "보안"],
       "types": {
         "essential": true,
         "functional": false,
@@ -386,16 +325,14 @@
       "opt_out_method": ""
     }
   },
-  
+
   "children_privacy": {
     "collects_under_14": false,
     "parental_consent_required": true,
     "consent_verification_method": "만 19세 이상만 계좌 개설 가능",
-    "special_protections": [
-      "미성년자 계좌 개설 제한"
-    ]
+    "special_protections": ["미성년자 계좌 개설 제한"]
   },
-  
+
   "compliance": {
     "certifications": [
       {
@@ -430,14 +367,11 @@
     "internal_audit_frequency": "연 4회",
     "external_audit_frequency": "연 2회"
   },
-  
+
   "additional_info": {
     "privacy_policy_updates": {
       "notification_days_before": 7,
-      "notification_methods": [
-        "앱 푸시",
-        "이메일"
-      ],
+      "notification_methods": ["앱 푸시", "이메일"],
       "version_history_available": true
     },
     "special_notes": [
@@ -448,4 +382,3 @@
     ]
   }
 }
-
