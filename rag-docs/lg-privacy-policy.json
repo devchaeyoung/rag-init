@@ -1,0 +1,345 @@
+{
+  "metadata": {
+    "company_name": "LG전자",
+    "company_name_en": "LG Electronics",
+    "industry": "전자제품 제조 및 판매",
+    "service_type": "가전, 모바일, 온라인 서비스",
+    "document_version": "4.7",
+    "last_updated": "2024-12-14",
+    "created_date": "2020-03-01",
+    "author": "개인정보보호팀 박영진",
+    "reviewer": "개인정보보호책임자 배두용",
+    "approver": "부사장 배두용",
+    "certifications": ["ISMS-P", "ISO27001"],
+    "compliance_laws": [
+      "개인정보보호법",
+      "정보통신망법",
+      "전자상거래법",
+      "EU GDPR"
+    ]
+  },
+
+  "contact": {
+    "privacy_officer": {
+      "name": "배두용",
+      "department": "개인정보보호팀",
+      "email": "privacy@lge.com",
+      "phone": "02-3777-1114",
+      "business_hours": "평일 09:00-18:00"
+    },
+    "customer_service": {
+      "phone": "1544-7777",
+      "email": "lgservice@lge.com",
+      "operating_hours": "연중무휴 09:00-18:00",
+      "response_time_hours": 24
+    },
+    "privacy_policy_url": "https://www.lge.co.kr/privacy"
+  },
+
+  "account_security": {
+    "password_policy": {
+      "min_length": 8,
+      "max_length": 20,
+      "required_characters": ["영문", "숫자", "특수문자"],
+      "special_chars_allowed": true,
+      "allowed_special_chars": "!@#$%^&*()_+-=",
+      "consecutive_char_limit": 3,
+      "repeated_char_limit": 3,
+      "personal_info_forbidden": true,
+      "common_password_check": true
+    },
+    "password_management": {
+      "change_period_days": 0,
+      "reuse_prevention_count": 3,
+      "initial_password_method": "사용자 직접 설정",
+      "force_change_on_first_login": false,
+      "password_reset_method": ["이메일 인증", "SMS 인증"]
+    },
+    "login_security": {
+      "max_login_attempts": 5,
+      "account_lock_duration_minutes": 30,
+      "session_timeout_minutes": 30,
+      "concurrent_login_allowed": true,
+      "ip_restriction": false,
+      "device_restriction": false
+    },
+    "multi_factor_authentication": {
+      "enabled": true,
+      "required": false,
+      "methods": ["SMS", "이메일"],
+      "applicable_to": "선택 사용"
+    }
+  },
+
+  "data_collection": {
+    "required_fields": ["이름", "이메일", "비밀번호", "전화번호"],
+    "optional_fields": ["생년월일", "성별", "주소"],
+    "auto_collected_fields": [
+      "IP 주소",
+      "쿠키",
+      "기기 정보",
+      "OS 정보",
+      "앱 사용 기록",
+      "위치정보",
+      "음성 인식 데이터 (ThinQ)"
+    ],
+    "purpose": {
+      "member_management": "회원 가입, 본인 확인, LG 계정 관리",
+      "service_provision": "제품 등록, A/S, ThinQ 서비스, 제품 업데이트",
+      "marketing": "신제품 안내, 프로모션, 맞춤형 광고",
+      "legal_obligation": "법령 준수, 품질 개선"
+    },
+    "legal_basis": ["개인정보보호법 제15조", "정보통신망법 제22조"],
+    "consent_method": "회원가입 시 동의 체크"
+  },
+
+  "data_retention": {
+    "retention_periods": [
+      {
+        "data_type": "회원 정보",
+        "period": "회원 탈퇴 시까지",
+        "legal_basis": "개인정보보호법"
+      },
+      {
+        "data_type": "구매 기록",
+        "period": "5년",
+        "legal_basis": "전자상거래법"
+      },
+      {
+        "data_type": "A/S 기록",
+        "period": "3년",
+        "legal_basis": "전자상거래법"
+      },
+      {
+        "data_type": "제품 등록 정보",
+        "period": "제품 보증 기간 + 3년",
+        "legal_basis": "제조물책임법"
+      },
+      {
+        "data_type": "접속 로그",
+        "period": "3개월",
+        "legal_basis": "통신비밀보호법"
+      }
+    ],
+    "destruction": {
+      "timing": "보유기간 만료 후 5일 이내",
+      "method_electronic": "복구 불가능한 방식으로 영구 삭제",
+      "method_paper": "파쇄 또는 소각",
+      "responsible_department": "개인정보보호팀",
+      "record_keeping": true,
+      "record_period_years": 3
+    },
+    "inactive_account": {
+      "inactive_period_months": 12,
+      "notification_days_before": 30,
+      "separate_storage": true,
+      "destruction_after_years": 3
+    }
+  },
+
+  "security_measures": {
+    "encryption": {
+      "storage": {
+        "enabled": true,
+        "targets": ["비밀번호", "카드번호", "주민등록번호"],
+        "algorithm": "AES-256",
+        "key_management": "HSM"
+      },
+      "transmission": {
+        "enabled": true,
+        "protocol": "TLS 1.2 이상",
+        "scope": "전체 통신"
+      }
+    },
+    "access_control": {
+      "authorized_personnel": "개인정보취급자",
+      "authorization_process": "팀장 승인",
+      "review_period_months": 6,
+      "access_log_enabled": true,
+      "access_log_retention_months": 12,
+      "ip_whitelist": false,
+      "vpn_required": true
+    },
+    "physical_security": {
+      "server_location": "LG CNS IDC, AWS Seoul",
+      "access_control": ["출입카드", "생체인증", "CCTV"],
+      "backup_frequency": "일 1회",
+      "backup_location": "별도 IDC",
+      "backup_encryption": true
+    },
+    "technical_security": {
+      "firewall": true,
+      "ids_ips": true,
+      "antivirus": true,
+      "antivirus_update_frequency": "일 1회",
+      "security_patch_frequency": "월 1회",
+      "vulnerability_scan_frequency": "분기 1회",
+      "penetration_test_frequency": "연 1회"
+    }
+  },
+
+  "third_party": {
+    "data_sharing": [
+      {
+        "recipient": "LG전자 서비스센터",
+        "purpose": "A/S 처리",
+        "items": ["이름", "전화번호", "주소", "제품 정보"],
+        "retention_period": "A/S 완료 후 3년",
+        "consent_required": true
+      },
+      {
+        "recipient": "배송업체",
+        "purpose": "제품 배송",
+        "items": ["이름", "전화번호", "주소"],
+        "retention_period": "배송 완료 후 30일",
+        "consent_required": true
+      }
+    ],
+    "data_processing_consignment": [
+      {
+        "processor": "LG CNS",
+        "task": "IT 인프라 운영",
+        "items": ["전체 개인정보"],
+        "retention_period": "위탁 계약 종료 시까지"
+      },
+      {
+        "processor": "AWS",
+        "task": "클라우드 서비스",
+        "items": ["서비스 이용 데이터"],
+        "retention_period": "위탁 계약 종료 시까지"
+      },
+      {
+        "processor": "나이스평가정보",
+        "task": "본인인증",
+        "items": ["이름", "생년월일", "휴대전화번호"],
+        "retention_period": "인증 완료 후 즉시 삭제"
+      }
+    ],
+    "international_transfer": {
+      "enabled": true,
+      "countries": ["미국"],
+      "recipients": ["AWS"],
+      "purpose": "클라우드 서비스 제공",
+      "items": ["서비스 이용 데이터"],
+      "retention_period": "서비스 이용 기간",
+      "consent_method": "회원가입 시 동의"
+    }
+  },
+
+  "user_rights": {
+    "access_request": {
+      "methods": ["웹사이트 LG 계정", "고객센터", "서면"],
+      "contact": "privacy@lge.com",
+      "processing_days": 10,
+      "fee": 0,
+      "identification_required": true
+    },
+    "correction_deletion": {
+      "methods": ["LG 계정 관리", "고객센터"],
+      "processing_days": 10,
+      "limitations": ["법령상 보존 의무"]
+    },
+    "processing_suspension": {
+      "methods": ["고객센터"],
+      "processing_days": 10,
+      "rejection_reasons": ["법적 의무", "계약 이행"]
+    },
+    "consent_withdrawal": {
+      "methods": ["LG 계정 > 회원 탈퇴", "고객센터"],
+      "effective_immediately": true,
+      "post_withdrawal_action": "즉시 파기 (법령 보관 의무 제외)"
+    }
+  },
+
+  "breach_response": {
+    "monitoring": "24시간 365일",
+    "response_team": "보안팀, 개인정보보호팀, IT팀",
+    "response_procedure": [
+      "침해 탐지 및 차단",
+      "피해 범위 분석",
+      "긴급 보안 조치",
+      "원인 분석",
+      "재발 방지"
+    ],
+    "user_notification": {
+      "timing_hours": 24,
+      "methods": ["이메일", "SMS", "웹사이트 공지"]
+    },
+    "authority_notification": {
+      "authorities": ["개인정보보호위원회", "한국인터넷진흥원"],
+      "timing_hours": 24
+    },
+    "compensation_policy": true,
+    "dispute_resolution": ["개인정보 분쟁조정위원회", "한국소비자원"]
+  },
+
+  "cookies_tracking": {
+    "cookies": {
+      "enabled": true,
+      "purposes": ["로그인 유지", "맞춤형 서비스", "통계 분석"],
+      "types": {
+        "essential": true,
+        "functional": true,
+        "analytics": true,
+        "advertising": true
+      },
+      "retention_period": "최대 2년",
+      "opt_out_method": "브라우저 설정"
+    },
+    "behavioral_tracking": {
+      "enabled": true,
+      "tools": ["Google Analytics", "Adobe Analytics"],
+      "purpose": "서비스 개선, 광고",
+      "opt_out_available": true,
+      "opt_out_method": "LG 계정 설정"
+    }
+  },
+
+  "children_privacy": {
+    "collects_under_14": false,
+    "parental_consent_required": true,
+    "consent_verification_method": "본인인증",
+    "special_protections": ["14세 미만 법정대리인 동의 필수"]
+  },
+
+  "compliance": {
+    "certifications": [
+      {
+        "name": "ISMS-P",
+        "certified": true,
+        "certification_date": "2023-03-01",
+        "expiry_date": "2026-02-28",
+        "certificate_number": "ISMS-P-2023-0034"
+      },
+      {
+        "name": "ISO 27001",
+        "certified": true,
+        "certification_date": "2022-07-01",
+        "expiry_date": "2025-06-30",
+        "certificate_number": "ISO27001-2022-0189"
+      }
+    ],
+    "training": {
+      "frequency": "반기별",
+      "target": "전 직원",
+      "mandatory": true,
+      "completion_tracking": true
+    },
+    "policy_review_frequency": "연 2회",
+    "internal_audit_frequency": "연 2회",
+    "external_audit_frequency": "연 1회"
+  },
+
+  "additional_info": {
+    "privacy_policy_updates": {
+      "notification_days_before": 7,
+      "notification_methods": ["웹사이트 공지", "이메일"],
+      "version_history_available": true
+    },
+    "special_notes": [
+      "LG ThinQ 앱을 통한 IoT 기기 관리",
+      "음성 인식 데이터는 사용자가 삭제 가능",
+      "제품 등록 시 보증 서비스 제공"
+    ]
+  }
+}

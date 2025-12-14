@@ -8,7 +8,7 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { RagService } from './rag.service';
+import { RagService } from '../services/rag.service';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 

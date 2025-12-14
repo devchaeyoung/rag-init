@@ -1,0 +1,383 @@
+{
+  "metadata": {
+    "company_name": "카카오",
+    "company_name_en": "Kakao Corp",
+    "industry": "인터넷 플랫폼",
+    "service_type": "메신저, 콘텐츠, 커머스, 모빌리티",
+    "document_version": "4.2",
+    "last_updated": "2024-12-14",
+    "created_date": "2020-06-01",
+    "author": "개인정보보호팀 정민호",
+    "reviewer": "개인정보보호책임자 조수용",
+    "approver": "대표이사 홍은택",
+    "certifications": ["ISMS-P", "ISO27001", "ISO27018"],
+    "compliance_laws": [
+      "개인정보보호법",
+      "정보통신망법",
+      "전자금융거래법",
+      "위치정보보호법"
+    ]
+  },
+
+  "contact": {
+    "privacy_officer": {
+      "name": "조수용",
+      "department": "개인정보보호팀",
+      "email": "privacy@kakaocorp.com",
+      "phone": "1577-3754",
+      "business_hours": "평일 09:00-18:00"
+    },
+    "customer_service": {
+      "phone": "1577-3754",
+      "email": "help.kakao.com",
+      "operating_hours": "평일 09:00-18:00 (주말/공휴일 제외)",
+      "response_time_hours": 24
+    },
+    "privacy_policy_url": "https://www.kakao.com/policy/privacy"
+  },
+
+  "account_security": {
+    "password_policy": {
+      "min_length": 8,
+      "max_length": 32,
+      "required_characters": ["영문", "숫자"],
+      "special_chars_allowed": true,
+      "allowed_special_chars": "!@#$%^&*()_+-=[]{}|;:',.<>?/~`",
+      "consecutive_char_limit": 3,
+      "repeated_char_limit": 3,
+      "personal_info_forbidden": true,
+      "common_password_check": true
+    },
+    "password_management": {
+      "change_period_days": 0,
+      "reuse_prevention_count": 4,
+      "initial_password_method": "사용자 직접 설정",
+      "force_change_on_first_login": false,
+      "password_reset_method": ["카카오톡 인증", "이메일 인증", "SMS 인증"]
+    },
+    "login_security": {
+      "max_login_attempts": 5,
+      "account_lock_duration_minutes": 60,
+      "session_timeout_minutes": 0,
+      "concurrent_login_allowed": true,
+      "ip_restriction": false,
+      "device_restriction": false
+    },
+    "multi_factor_authentication": {
+      "enabled": true,
+      "required": false,
+      "methods": ["카카오톡 인증", "SMS", "생체인증"],
+      "applicable_to": "선택 사용"
+    }
+  },
+
+  "data_collection": {
+    "required_fields": ["휴대전화번호", "비밀번호", "닉네임"],
+    "optional_fields": ["프로필 사진", "이메일", "생년월일", "성별", "관심사"],
+    "auto_collected_fields": [
+      "IP 주소",
+      "쿠키",
+      "접속 로그",
+      "서비스 이용기록",
+      "기기 정보",
+      "OS 버전",
+      "통신사",
+      "광고 식별자",
+      "위치정보"
+    ],
+    "purpose": {
+      "member_management": "회원 가입, 본인 확인, 계정 관리",
+      "service_provision": "카카오톡, 카카오페이, 카카오T 등 서비스 제공",
+      "marketing": "맞춤형 광고, 이벤트 정보, 신규 서비스 안내",
+      "legal_obligation": "법령 준수, 부정 이용 방지"
+    },
+    "legal_basis": [
+      "개인정보보호법 제15조",
+      "정보통신망법 제22조",
+      "위치정보보호법 제16조"
+    ],
+    "consent_method": "동의 버튼 클릭 (선택적 동의 항목 별도 표시)"
+  },
+
+  "data_retention": {
+    "retention_periods": [
+      {
+        "data_type": "회원 정보",
+        "period": "회원 탈퇴 시까지",
+        "legal_basis": "개인정보보호법"
+      },
+      {
+        "data_type": "거래 기록",
+        "period": "5년",
+        "legal_basis": "전자상거래법"
+      },
+      {
+        "data_type": "금융거래 정보",
+        "period": "5년",
+        "legal_basis": "전자금융거래법"
+      },
+      {
+        "data_type": "소비자 불만 기록",
+        "period": "3년",
+        "legal_basis": "전자상거래법"
+      },
+      {
+        "data_type": "위치정보",
+        "period": "이용 목적 달성 후 즉시 파기",
+        "legal_basis": "위치정보보호법"
+      },
+      {
+        "data_type": "카카오톡 대화 내용",
+        "period": "서버 미저장 (기기 내 저장)",
+        "legal_basis": "통신비밀보호법"
+      }
+    ],
+    "destruction": {
+      "timing": "보유기간 만료 후 5일 이내",
+      "method_electronic": "복구 불가능한 방식으로 영구 삭제",
+      "method_paper": "파쇄 또는 소각",
+      "responsible_department": "개인정보보호팀",
+      "record_keeping": true,
+      "record_period_years": 3
+    },
+    "inactive_account": {
+      "inactive_period_months": 12,
+      "notification_days_before": 30,
+      "separate_storage": true,
+      "destruction_after_years": 3
+    }
+  },
+
+  "security_measures": {
+    "encryption": {
+      "storage": {
+        "enabled": true,
+        "targets": ["비밀번호", "카드번호", "계좌번호", "생체정보"],
+        "algorithm": "AES-256",
+        "key_management": "HSM"
+      },
+      "transmission": {
+        "enabled": true,
+        "protocol": "TLS 1.3",
+        "scope": "전체 통신 (End-to-End 암호화 적용)"
+      }
+    },
+    "access_control": {
+      "authorized_personnel": "최소 권한 원칙 적용",
+      "authorization_process": "부서장 승인 필요",
+      "review_period_months": 6,
+      "access_log_enabled": true,
+      "access_log_retention_months": 12,
+      "ip_whitelist": true,
+      "vpn_required": true
+    },
+    "physical_security": {
+      "server_location": "카카오 데이터센터 (안양), AWS Seoul",
+      "access_control": ["출입카드", "생체인증", "24시간 CCTV", "보안요원"],
+      "backup_frequency": "실시간",
+      "backup_location": "분산 백업 (3개 이상 지역)",
+      "backup_encryption": true
+    },
+    "technical_security": {
+      "firewall": true,
+      "ids_ips": true,
+      "antivirus": true,
+      "antivirus_update_frequency": "실시간",
+      "security_patch_frequency": "월 1회 (긴급 시 즉시)",
+      "vulnerability_scan_frequency": "월 1회",
+      "penetration_test_frequency": "분기 1회"
+    }
+  },
+
+  "third_party": {
+    "data_sharing": [
+      {
+        "recipient": "카카오페이 가맹점",
+        "purpose": "결제 및 배송",
+        "items": ["이름", "전화번호", "주소"],
+        "retention_period": "거래 완료 후 5년",
+        "consent_required": true
+      },
+      {
+        "recipient": "카카오T 배차 기사",
+        "purpose": "승차 서비스 제공",
+        "items": ["닉네임", "출발지/도착지"],
+        "retention_period": "서비스 완료 시까지",
+        "consent_required": true
+      }
+    ],
+    "data_processing_consignment": [
+      {
+        "processor": "AWS",
+        "task": "클라우드 인프라 운영",
+        "items": ["서비스 이용 데이터"],
+        "retention_period": "위탁 계약 종료 시까지"
+      },
+      {
+        "processor": "SK텔링크/KT/LGU+",
+        "task": "SMS/알림톡 발송",
+        "items": ["전화번호", "발송 내용"],
+        "retention_period": "발송 후 즉시 삭제"
+      },
+      {
+        "processor": "다날/나이스평가정보",
+        "task": "본인인증",
+        "items": ["이름", "생년월일", "휴대전화번호"],
+        "retention_period": "인증 완료 후 즉시 삭제"
+      }
+    ],
+    "international_transfer": {
+      "enabled": true,
+      "countries": ["미국", "일본"],
+      "recipients": ["AWS (미국)", "Google Cloud (미국)"],
+      "purpose": "글로벌 서비스 인프라 운영",
+      "items": ["서비스 이용 데이터"],
+      "retention_period": "서비스 이용 기간",
+      "consent_method": "별도 명시적 동의"
+    }
+  },
+
+  "user_rights": {
+    "access_request": {
+      "methods": ["카카오 계정 관리", "고객센터", "서면"],
+      "contact": "privacy@kakaocorp.com",
+      "processing_days": 10,
+      "fee": 0,
+      "identification_required": true
+    },
+    "correction_deletion": {
+      "methods": ["카카오 계정 관리", "고객센터"],
+      "processing_days": 10,
+      "limitations": ["법령상 보존 의무", "타인의 권리 침해 우려"]
+    },
+    "processing_suspension": {
+      "methods": ["카카오 계정 관리", "고객센터"],
+      "processing_days": 10,
+      "rejection_reasons": ["법적 의무", "계약 이행 필요"]
+    },
+    "consent_withdrawal": {
+      "methods": ["카카오 계정 관리 > 개인정보 관리", "고객센터"],
+      "effective_immediately": true,
+      "post_withdrawal_action": "서비스 이용 제한, 30일 후 파기"
+    }
+  },
+
+  "breach_response": {
+    "monitoring": "24시간 365일",
+    "response_team": "보안대응팀, 개인정보보호팀, 법무팀",
+    "response_procedure": [
+      "침해사고 탐지 및 차단",
+      "피해 규모 및 원인 분석",
+      "긴급 보안 조치",
+      "증거 수집 및 보존",
+      "재발 방지 대책 수립"
+    ],
+    "user_notification": {
+      "timing_hours": 24,
+      "methods": ["카카오톡 메시지", "SMS", "이메일", "앱 푸시"]
+    },
+    "authority_notification": {
+      "authorities": ["개인정보보호위원회", "한국인터넷진흥원", "경찰청"],
+      "timing_hours": 24
+    },
+    "compensation_policy": true,
+    "dispute_resolution": [
+      "개인정보 분쟁조정위원회",
+      "한국소비자원",
+      "개인정보 침해신고센터"
+    ]
+  },
+
+  "cookies_tracking": {
+    "cookies": {
+      "enabled": true,
+      "purposes": [
+        "로그인 유지",
+        "보안 설정",
+        "맞춤형 콘텐츠 제공",
+        "통계 분석"
+      ],
+      "types": {
+        "essential": true,
+        "functional": true,
+        "analytics": true,
+        "advertising": true
+      },
+      "retention_period": "최대 2년",
+      "opt_out_method": "브라우저 설정 또는 카카오 계정 관리"
+    },
+    "behavioral_tracking": {
+      "enabled": true,
+      "tools": [
+        "카카오 애널리틱스",
+        "Google Analytics",
+        "Firebase",
+        "Appsflyer"
+      ],
+      "purpose": "서비스 개선, 맞춤형 광고",
+      "opt_out_available": true,
+      "opt_out_method": "카카오 계정 관리 > 광고 설정"
+    }
+  },
+
+  "children_privacy": {
+    "collects_under_14": true,
+    "parental_consent_required": true,
+    "consent_verification_method": "법정대리인 본인인증",
+    "special_protections": [
+      "14세 미만 법정대리인 동의 필수",
+      "아동·청소년 유해 콘텐츠 필터링",
+      "행동추적 광고 제한"
+    ]
+  },
+
+  "compliance": {
+    "certifications": [
+      {
+        "name": "ISMS-P",
+        "certified": true,
+        "certification_date": "2022-08-01",
+        "expiry_date": "2025-07-31",
+        "certificate_number": "ISMS-P-2022-0089"
+      },
+      {
+        "name": "ISO 27001",
+        "certified": true,
+        "certification_date": "2021-12-01",
+        "expiry_date": "2024-11-30",
+        "certificate_number": "ISO27001-2021-0234"
+      },
+      {
+        "name": "ISO 27018",
+        "certified": true,
+        "certification_date": "2023-03-01",
+        "expiry_date": "2026-02-28",
+        "certificate_number": "ISO27018-2023-0045"
+      }
+    ],
+    "training": {
+      "frequency": "분기별",
+      "target": "전 직원",
+      "mandatory": true,
+      "completion_tracking": true
+    },
+    "policy_review_frequency": "연 2회",
+    "internal_audit_frequency": "연 2회",
+    "external_audit_frequency": "연 1회"
+  },
+
+  "additional_info": {
+    "privacy_policy_updates": {
+      "notification_days_before": 7,
+      "notification_methods": ["카카오톡 메시지", "웹사이트 공지", "이메일"],
+      "version_history_available": true
+    },
+    "special_notes": [
+      "카카오톡 대화 내용은 서버에 저장되지 않음 (단, 오픈채팅 제외)",
+      "카카오페이, 카카오뱅크는 별도 개인정보 처리방침 적용",
+      "위치정보는 실시간 동의 후 수집",
+      "맞춤형 광고 수신 거부 가능",
+      "카카오 계정 통합 로그인 제공"
+    ]
+  }
+}

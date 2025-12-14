@@ -1,0 +1,423 @@
+{
+  "metadata": {
+    "company_name": "네이버",
+    "company_name_en": "NAVER Corporation",
+    "industry": "인터넷 포털",
+    "service_type": "검색엔진, 커뮤니케이션, 커머스",
+    "document_version": "3.5",
+    "last_updated": "2024-12-14",
+    "created_date": "2021-01-01",
+    "author": "개인정보보호팀 박서영",
+    "reviewer": "개인정보보호책임자 최수연",
+    "approver": "대표이사 최수연",
+    "certifications": ["ISMS-P", "ISO27001", "ISO27701"],
+    "compliance_laws": [
+      "개인정보보호법",
+      "정보통신망법",
+      "신용정보법",
+      "전자금융거래법"
+    ]
+  },
+
+  "contact": {
+    "privacy_officer": {
+      "name": "최수연",
+      "department": "개인정보보호팀",
+      "email": "privacy@navercorp.com",
+      "phone": "1588-3820",
+      "business_hours": "평일 09:00-18:00"
+    },
+    "customer_service": {
+      "phone": "1588-3820",
+      "email": "helpcenter@naver.com",
+      "operating_hours": "연중무휴 00:00-24:00",
+      "response_time_hours": 24
+    },
+    "privacy_policy_url": "https://policy.naver.com/policy/privacy.html"
+  },
+
+  "account_security": {
+    "password_policy": {
+      "min_length": 8,
+      "max_length": 16,
+      "required_characters": ["영문", "숫자", "특수문자"],
+      "special_chars_allowed": true,
+      "allowed_special_chars": "!@#$%^&*()_+-=[]{}|",
+      "consecutive_char_limit": 4,
+      "repeated_char_limit": 4,
+      "personal_info_forbidden": true,
+      "common_password_check": true
+    },
+    "password_management": {
+      "change_period_days": 180,
+      "reuse_prevention_count": 5,
+      "initial_password_method": "사용자 직접 설정",
+      "force_change_on_first_login": false,
+      "password_reset_method": ["이메일 인증", "SMS 인증", "본인인증"]
+    },
+    "login_security": {
+      "max_login_attempts": 10,
+      "account_lock_duration_minutes": 60,
+      "session_timeout_minutes": 120,
+      "concurrent_login_allowed": true,
+      "ip_restriction": false,
+      "device_restriction": false
+    },
+    "multi_factor_authentication": {
+      "enabled": true,
+      "required": false,
+      "methods": ["SMS", "OTP 앱", "생체인증", "FIDO 인증"],
+      "applicable_to": "선택적 적용 (중요 작업 시 권장)"
+    }
+  },
+
+  "data_collection": {
+    "required_fields": [
+      "아이디",
+      "비밀번호",
+      "이름",
+      "생년월일",
+      "성별",
+      "휴대전화번호"
+    ],
+    "optional_fields": ["이메일", "프로필 사진", "관심사"],
+    "auto_collected_fields": [
+      "IP 주소",
+      "쿠키",
+      "접속 로그",
+      "방문 일시",
+      "서비스 이용기록",
+      "검색어",
+      "기기 정보",
+      "OS 정보",
+      "브라우저 정보",
+      "통신사 정보"
+    ],
+    "purpose": {
+      "member_management": "회원 가입, 본인 확인, 계정 관리, 연령 확인",
+      "service_provision": "검색, 메일, 카페, 블로그 등 서비스 제공",
+      "marketing": "맞춤형 광고, 이벤트 정보 제공",
+      "legal_obligation": "법령상 의무 이행, 부정 이용 방지"
+    },
+    "legal_basis": [
+      "개인정보보호법 제15조",
+      "정보통신망법 제22조",
+      "청소년보호법 제19조"
+    ],
+    "consent_method": "명시적 동의"
+  },
+
+  "data_retention": {
+    "retention_periods": [
+      {
+        "data_type": "회원 정보",
+        "period": "회원 탈퇴 시까지",
+        "legal_basis": "개인정보보호법"
+      },
+      {
+        "data_type": "결제/구매 기록",
+        "period": "5년",
+        "legal_basis": "전자상거래법"
+      },
+      {
+        "data_type": "금융거래 기록",
+        "period": "5년",
+        "legal_basis": "전자금융거래법"
+      },
+      {
+        "data_type": "소비자 불만 기록",
+        "period": "3년",
+        "legal_basis": "전자상거래법"
+      },
+      {
+        "data_type": "접속 로그",
+        "period": "3개월",
+        "legal_basis": "통신비밀보호법"
+      },
+      {
+        "data_type": "검색어 기록",
+        "period": "1년",
+        "legal_basis": "서비스 개선 목적"
+      }
+    ],
+    "destruction": {
+      "timing": "보유기간 만료 후 5일 이내",
+      "method_electronic": "복구 불가능한 방식으로 영구 삭제 (DoD 5220.22-M 방식)",
+      "method_paper": "파쇄 또는 소각",
+      "responsible_department": "개인정보보호팀",
+      "record_keeping": true,
+      "record_period_years": 5
+    },
+    "inactive_account": {
+      "inactive_period_months": 12,
+      "notification_days_before": 30,
+      "separate_storage": true,
+      "destruction_after_years": 4
+    }
+  },
+
+  "security_measures": {
+    "encryption": {
+      "storage": {
+        "enabled": true,
+        "targets": [
+          "비밀번호",
+          "주민등록번호",
+          "외국인등록번호",
+          "여권번호",
+          "카드번호",
+          "계좌번호",
+          "생체정보"
+        ],
+        "algorithm": "AES-256",
+        "key_management": "HSM + Key Rotation (90일)"
+      },
+      "transmission": {
+        "enabled": true,
+        "protocol": "TLS 1.3",
+        "scope": "전체 통신 (HSTS 적용)"
+      }
+    },
+    "access_control": {
+      "authorized_personnel": "개인정보취급자 최소 인원",
+      "authorization_process": "부서장 승인 + 보안팀 검토",
+      "review_period_months": 3,
+      "access_log_enabled": true,
+      "access_log_retention_months": 24,
+      "ip_whitelist": true,
+      "vpn_required": true
+    },
+    "physical_security": {
+      "server_location": "자체 IDC (춘천, 각남), AWS Seoul",
+      "access_control": [
+        "다중 출입인증",
+        "생체인증",
+        "24시간 CCTV",
+        "보안요원",
+        "맨트랩"
+      ],
+      "backup_frequency": "실시간 (Real-time Replication)",
+      "backup_location": "3개 이상 분산 백업",
+      "backup_encryption": true
+    },
+    "technical_security": {
+      "firewall": true,
+      "ids_ips": true,
+      "antivirus": true,
+      "antivirus_update_frequency": "실시간",
+      "security_patch_frequency": "주 1회",
+      "vulnerability_scan_frequency": "주 1회",
+      "penetration_test_frequency": "분기 1회"
+    }
+  },
+
+  "third_party": {
+    "data_sharing": [
+      {
+        "recipient": "네이버페이 가맹점",
+        "purpose": "상품 배송, 서비스 제공",
+        "items": ["이름", "전화번호", "배송지 주소"],
+        "retention_period": "거래 완료 후 5년",
+        "consent_required": true
+      },
+      {
+        "recipient": "광고주",
+        "purpose": "맞춤형 광고",
+        "items": ["광고 식별자", "관심사 정보", "접속 로그"],
+        "retention_period": "1년",
+        "consent_required": true
+      }
+    ],
+    "data_processing_consignment": [
+      {
+        "processor": "AWS Korea",
+        "task": "클라우드 인프라 운영",
+        "items": ["서비스 이용 데이터"],
+        "retention_period": "위탁 계약 종료 시까지"
+      },
+      {
+        "processor": "KT/SKT/LGU+",
+        "task": "SMS/알림톡 발송",
+        "items": ["전화번호", "발송 내용"],
+        "retention_period": "발송 후 즉시 삭제"
+      },
+      {
+        "processor": "Nice평가정보",
+        "task": "본인인증",
+        "items": ["이름", "생년월일", "휴대전화번호"],
+        "retention_period": "인증 완료 후 즉시 삭제"
+      }
+    ],
+    "international_transfer": {
+      "enabled": true,
+      "countries": ["일본", "대만", "베트남"],
+      "recipients": ["NAVER Japan", "LINE Corporation"],
+      "purpose": "LINE 연동 서비스 제공",
+      "items": ["프로필 정보", "친구 목록"],
+      "retention_period": "서비스 이용 기간",
+      "consent_method": "별도 명시적 동의"
+    }
+  },
+
+  "user_rights": {
+    "access_request": {
+      "methods": ["네이버 내정보", "고객센터", "서면"],
+      "contact": "privacy@navercorp.com",
+      "processing_days": 10,
+      "fee": 0,
+      "identification_required": true
+    },
+    "correction_deletion": {
+      "methods": ["네이버 내정보", "고객센터"],
+      "processing_days": 10,
+      "limitations": ["법령상 보존 의무", "다른 사용자의 권리 침해"]
+    },
+    "processing_suspension": {
+      "methods": ["네이버 내정보", "고객센터"],
+      "processing_days": 10,
+      "rejection_reasons": ["법적 의무", "계약 이행", "공공의 이익"]
+    },
+    "consent_withdrawal": {
+      "methods": ["네이버 내정보 > 개인정보 관리", "고객센터"],
+      "effective_immediately": true,
+      "post_withdrawal_action": "즉시 이용 제한, 30일 후 파기"
+    }
+  },
+
+  "breach_response": {
+    "monitoring": "24시간 365일 (Security Operations Center)",
+    "response_team": "보안대응센터 (Security Response Team), 개인정보보호팀, 법무팀",
+    "response_procedure": [
+      "침해사고 탐지 및 즉시 차단",
+      "영향 범위 및 피해 규모 분석",
+      "긴급 보안 패치 및 조치",
+      "포렌식 분석 및 증거 확보",
+      "재발 방지 대책 수립 및 이행"
+    ],
+    "user_notification": {
+      "timing_hours": 24,
+      "methods": [
+        "네이버톡톡",
+        "SMS",
+        "이메일",
+        "앱 푸시",
+        "웹사이트 긴급 공지"
+      ]
+    },
+    "authority_notification": {
+      "authorities": [
+        "개인정보보호위원회",
+        "한국인터넷진흥원",
+        "경찰청 사이버안전국",
+        "방송통신위원회"
+      ],
+      "timing_hours": 24
+    },
+    "compensation_policy": true,
+    "dispute_resolution": [
+      "개인정보 분쟁조정위원회",
+      "한국인터넷진흥원 개인정보 침해신고센터",
+      "대검찰청 사이버범죄수사단",
+      "경찰청 사이버안전국"
+    ]
+  },
+
+  "cookies_tracking": {
+    "cookies": {
+      "enabled": true,
+      "purposes": [
+        "로그인 유지",
+        "보안 설정 유지",
+        "맞춤형 콘텐츠 추천",
+        "광고 표시",
+        "통계 분석"
+      ],
+      "types": {
+        "essential": true,
+        "functional": true,
+        "analytics": true,
+        "advertising": true
+      },
+      "retention_period": "최대 2년",
+      "opt_out_method": "네이버 내정보 > 광고 설정"
+    },
+    "behavioral_tracking": {
+      "enabled": true,
+      "tools": [
+        "네이버 애널리틱스",
+        "Google Analytics",
+        "Facebook Pixel",
+        "Criteo"
+      ],
+      "purpose": "맞춤형 광고, 서비스 개선, 트래픽 분석",
+      "opt_out_available": true,
+      "opt_out_method": "네이버 내정보 > 광고 설정 > 맞춤형 광고 거부"
+    }
+  },
+
+  "children_privacy": {
+    "collects_under_14": true,
+    "parental_consent_required": true,
+    "consent_verification_method": "본인인증 (법정대리인 인증)",
+    "special_protections": [
+      "14세 미만 법정대리인 동의 필수",
+      "아동·청소년 유해정보 차단",
+      "행동추적 광고 제한"
+    ]
+  },
+
+  "compliance": {
+    "certifications": [
+      {
+        "name": "ISMS-P",
+        "certified": true,
+        "certification_date": "2022-03-15",
+        "expiry_date": "2025-03-14",
+        "certificate_number": "ISMS-P-2022-0032"
+      },
+      {
+        "name": "ISO 27001",
+        "certified": true,
+        "certification_date": "2021-09-01",
+        "expiry_date": "2024-08-31",
+        "certificate_number": "ISO27001-2021-0089"
+      },
+      {
+        "name": "ISO 27701",
+        "certified": true,
+        "certification_date": "2023-06-01",
+        "expiry_date": "2026-05-31",
+        "certificate_number": "ISO27701-2023-0012"
+      }
+    ],
+    "training": {
+      "frequency": "분기별 (신규 직원 입사 시 즉시)",
+      "target": "전 직원 및 협력사",
+      "mandatory": true,
+      "completion_tracking": true
+    },
+    "policy_review_frequency": "연 2회",
+    "internal_audit_frequency": "연 4회",
+    "external_audit_frequency": "연 2회"
+  },
+
+  "additional_info": {
+    "privacy_policy_updates": {
+      "notification_days_before": 7,
+      "notification_methods": [
+        "네이버톡톡",
+        "웹사이트 공지",
+        "이메일",
+        "앱 푸시"
+      ],
+      "version_history_available": true
+    },
+    "special_notes": [
+      "네이버, 라인, 밴드, 웨일 등 계열사 통합 로그인 제공",
+      "네이버페이, 네이버페이 포인트는 별도 개인정보 처리방침 적용",
+      "검색어 자동완성 기능 개인별 차단 가능",
+      "광고성 정보 수신 동의 철회 가능",
+      "개인정보 다운로드 기능 제공 (내정보)"
+    ]
+  }
+}

@@ -1,0 +1,422 @@
+{
+  "metadata": {
+    "company_name": "직방",
+    "company_name_en": "Zigbang",
+    "industry": "부동산 중개 플랫폼",
+    "service_type": "부동산 정보 제공 및 중개",
+    "document_version": "2.8",
+    "last_updated": "2024-12-14",
+    "created_date": "2022-06-01",
+    "author": "개인정보보호팀 박민지",
+    "reviewer": "개인정보보호책임자 안성우",
+    "approver": "대표이사 안성우",
+    "certifications": [
+      "ISMS-P"
+    ],
+    "compliance_laws": [
+      "개인정보보호법",
+      "정보통신망법",
+      "공인중개사법",
+      "위치정보보호법"
+    ]
+  },
+  
+  "contact": {
+    "privacy_officer": {
+      "name": "안성우",
+      "department": "개인정보보호팀",
+      "email": "privacy@zigbang.com",
+      "phone": "1670-2702",
+      "business_hours": "평일 10:00-19:00"
+    },
+    "customer_service": {
+      "phone": "1670-2702",
+      "email": "help@zigbang.com",
+      "operating_hours": "평일 10:00-19:00",
+      "response_time_hours": 24
+    },
+    "privacy_policy_url": "https://www.zigbang.com/privacy"
+  },
+  
+  "account_security": {
+    "password_policy": {
+      "min_length": 8,
+      "max_length": 20,
+      "required_characters": [
+        "영문",
+        "숫자"
+      ],
+      "special_chars_allowed": true,
+      "allowed_special_chars": "!@#$%^&*",
+      "consecutive_char_limit": 3,
+      "repeated_char_limit": 3,
+      "personal_info_forbidden": true,
+      "common_password_check": true
+    },
+    "password_management": {
+      "change_period_days": 0,
+      "reuse_prevention_count": 3,
+      "initial_password_method": "사용자 직접 설정",
+      "force_change_on_first_login": false,
+      "password_reset_method": [
+        "이메일 인증",
+        "SMS 인증"
+      ]
+    },
+    "login_security": {
+      "max_login_attempts": 5,
+      "account_lock_duration_minutes": 30,
+      "session_timeout_minutes": 60,
+      "concurrent_login_allowed": true,
+      "ip_restriction": false,
+      "device_restriction": false
+    },
+    "multi_factor_authentication": {
+      "enabled": false,
+      "required": false,
+      "methods": [],
+      "applicable_to": ""
+    }
+  },
+  
+  "data_collection": {
+    "required_fields": [
+      "이름",
+      "전화번호",
+      "이메일"
+    ],
+    "optional_fields": [
+      "관심 지역",
+      "예산"
+    ],
+    "auto_collected_fields": [
+      "IP 주소",
+      "쿠키",
+      "접속 로그",
+      "검색 내역",
+      "찜 목록",
+      "위치정보",
+      "기기 정보",
+      "OS 정보"
+    ],
+    "purpose": {
+      "member_management": "회원 가입, 본인 확인",
+      "service_provision": "매물 정보 제공, 중개업소 연결, 계약 지원",
+      "marketing": "맞춤형 매물 추천, 이벤트 안내",
+      "legal_obligation": "공인중개사법 준수"
+    },
+    "legal_basis": [
+      "개인정보보호법 제15조",
+      "정보통신망법 제22조",
+      "공인중개사법",
+      "위치정보보호법"
+    ],
+    "consent_method": "회원가입 시 동의"
+  },
+  
+  "data_retention": {
+    "retention_periods": [
+      {
+        "data_type": "회원 정보",
+        "period": "회원 탈퇴 시까지",
+        "legal_basis": "개인정보보호법"
+      },
+      {
+        "data_type": "중개 계약 기록",
+        "period": "5년",
+        "legal_basis": "공인중개사법"
+      },
+      {
+        "data_type": "상담 기록",
+        "period": "3년",
+        "legal_basis": "전자상거래법"
+      },
+      {
+        "data_type": "위치정보",
+        "period": "서비스 제공 후 즉시 파기",
+        "legal_basis": "위치정보보호법"
+      },
+      {
+        "data_type": "접속 로그",
+        "period": "3개월",
+        "legal_basis": "통신비밀보호법"
+      }
+    ],
+    "destruction": {
+      "timing": "보유기간 만료 후 5일 이내",
+      "method_electronic": "복구 불가능한 방식으로 영구 삭제",
+      "method_paper": "파쇄 또는 소각",
+      "responsible_department": "개인정보보호팀",
+      "record_keeping": true,
+      "record_period_years": 3
+    },
+    "inactive_account": {
+      "inactive_period_months": 12,
+      "notification_days_before": 30,
+      "separate_storage": true,
+      "destruction_after_years": 3
+    }
+  },
+  
+  "security_measures": {
+    "encryption": {
+      "storage": {
+        "enabled": true,
+        "targets": [
+          "비밀번호",
+          "주민등록번호"
+        ],
+        "algorithm": "AES-256",
+        "key_management": "HSM"
+      },
+      "transmission": {
+        "enabled": true,
+        "protocol": "TLS 1.2",
+        "scope": "전체 통신"
+      }
+    },
+    "access_control": {
+      "authorized_personnel": "개인정보취급자",
+      "authorization_process": "팀장 승인",
+      "review_period_months": 6,
+      "access_log_enabled": true,
+      "access_log_retention_months": 6,
+      "ip_whitelist": false,
+      "vpn_required": true
+    },
+    "physical_security": {
+      "server_location": "AWS Seoul Region",
+      "access_control": [
+        "출입카드",
+        "CCTV"
+      ],
+      "backup_frequency": "일 1회",
+      "backup_location": "별도 백업센터",
+      "backup_encryption": true
+    },
+    "technical_security": {
+      "firewall": true,
+      "ids_ips": true,
+      "antivirus": true,
+      "antivirus_update_frequency": "일 1회",
+      "security_patch_frequency": "월 1회",
+      "vulnerability_scan_frequency": "분기 1회",
+      "penetration_test_frequency": "연 1회"
+    }
+  },
+  
+  "third_party": {
+    "data_sharing": [
+      {
+        "recipient": "중개업소",
+        "purpose": "매물 상담 및 계약 중개",
+        "items": [
+          "이름",
+          "전화번호"
+        ],
+        "retention_period": "상담 완료 후 5년",
+        "consent_required": true
+      },
+      {
+        "recipient": "부동산 임대인",
+        "purpose": "계약 체결",
+        "items": [
+          "이름",
+          "전화번호"
+        ],
+        "retention_period": "계약 완료 후 5년",
+        "consent_required": true
+      }
+    ],
+    "data_processing_consignment": [
+      {
+        "processor": "AWS",
+        "task": "클라우드 인프라",
+        "items": [
+          "전체 개인정보"
+        ],
+        "retention_period": "위탁 계약 종료 시까지"
+      },
+      {
+        "processor": "알리고",
+        "task": "SMS 발송",
+        "items": [
+          "전화번호"
+        ],
+        "retention_period": "발송 후 즉시 삭제"
+      },
+      {
+        "processor": "나이스평가정보",
+        "task": "본인인증",
+        "items": [
+          "이름",
+          "생년월일",
+          "휴대전화번호"
+        ],
+        "retention_period": "인증 완료 후 즉시 삭제"
+      }
+    ],
+    "international_transfer": {
+      "enabled": false,
+      "countries": [],
+      "recipients": [],
+      "purpose": "",
+      "items": [],
+      "retention_period": "",
+      "consent_method": ""
+    }
+  },
+  
+  "user_rights": {
+    "access_request": {
+      "methods": [
+        "웹사이트",
+        "앱",
+        "고객센터"
+      ],
+      "contact": "privacy@zigbang.com",
+      "processing_days": 10,
+      "fee": 0,
+      "identification_required": true
+    },
+    "correction_deletion": {
+      "methods": [
+        "웹사이트",
+        "앱",
+        "고객센터"
+      ],
+      "processing_days": 10,
+      "limitations": [
+        "법령상 보존 의무"
+      ]
+    },
+    "processing_suspension": {
+      "methods": [
+        "고객센터"
+      ],
+      "processing_days": 10,
+      "rejection_reasons": [
+        "법적 의무",
+        "계약 이행"
+      ]
+    },
+    "consent_withdrawal": {
+      "methods": [
+        "앱 > 마이페이지 > 회원탈퇴",
+        "고객센터"
+      ],
+      "effective_immediately": true,
+      "post_withdrawal_action": "즉시 파기"
+    }
+  },
+  
+  "breach_response": {
+    "monitoring": "24시간",
+    "response_team": "보안팀, 개인정보보호팀",
+    "response_procedure": [
+      "침해 탐지",
+      "피해 분석",
+      "긴급 조치",
+      "원인 분석",
+      "재발 방지"
+    ],
+    "user_notification": {
+      "timing_hours": 24,
+      "methods": [
+        "이메일",
+        "SMS",
+        "앱 푸시"
+      ]
+    },
+    "authority_notification": {
+      "authorities": [
+        "개인정보보호위원회",
+        "한국인터넷진흥원"
+      ],
+      "timing_hours": 24
+    },
+    "compensation_policy": true,
+    "dispute_resolution": [
+      "개인정보 분쟁조정위원회",
+      "한국소비자원"
+    ]
+  },
+  
+  "cookies_tracking": {
+    "cookies": {
+      "enabled": true,
+      "purposes": [
+        "로그인 유지",
+        "검색 기록",
+        "맞춤형 매물 추천"
+      ],
+      "types": {
+        "essential": true,
+        "functional": true,
+        "analytics": true,
+        "advertising": true
+      },
+      "retention_period": "최대 1년",
+      "opt_out_method": "브라우저 설정"
+    },
+    "behavioral_tracking": {
+      "enabled": true,
+      "tools": [
+        "Google Analytics",
+        "Facebook Pixel"
+      ],
+      "purpose": "서비스 개선, 광고",
+      "opt_out_available": true,
+      "opt_out_method": "앱 설정"
+    }
+  },
+  
+  "children_privacy": {
+    "collects_under_14": false,
+    "parental_consent_required": true,
+    "consent_verification_method": "본인인증",
+    "special_protections": [
+      "14세 미만 회원가입 제한"
+    ]
+  },
+  
+  "compliance": {
+    "certifications": [
+      {
+        "name": "ISMS-P",
+        "certified": true,
+        "certification_date": "2023-07-01",
+        "expiry_date": "2026-06-30",
+        "certificate_number": "ISMS-P-2023-0134"
+      }
+    ],
+    "training": {
+      "frequency": "반기별",
+      "target": "전 직원",
+      "mandatory": true,
+      "completion_tracking": true
+    },
+    "policy_review_frequency": "연 1회",
+    "internal_audit_frequency": "연 2회",
+    "external_audit_frequency": "연 1회"
+  },
+  
+  "additional_info": {
+    "privacy_policy_updates": {
+      "notification_days_before": 7,
+      "notification_methods": [
+        "웹사이트 공지",
+        "앱 푸시",
+        "이메일"
+      ],
+      "version_history_available": true
+    },
+    "special_notes": [
+      "위치정보는 매물 검색 시에만 수집",
+      "중개업소와 정보 공유 시 별도 동의",
+      "계약 체결 시 공인중개사법에 따른 기록 보관",
+      "다방, 호갱노노 등 계열사 서비스 연동"
+    ]
+  }
+}
+
