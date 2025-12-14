@@ -145,7 +145,7 @@ export class RagController {
   }
 
   /**
-   * 디렉토리의 모든 문서 인덱싱
+   * 디렉토리의 모든 문서 인덱싱 (전체 재인덱싱)
    * 
    * POST /rag/index-directory
    * 
@@ -180,6 +180,107 @@ export class RagController {
         success: true,
         filesProcessed,
         message: `${filesProcessed}개 파일이 성공적으로 인덱싱되었습니다.`,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * 디렉토리의 문서 증분 업데이트 (변경된 파일만 재인덱싱)
+   * 
+   * POST /rag/incremental-index
+   * 
+   * 요청 본문:
+   * {
+   *   "dirPath": "rag-docs",
+   *   "recursive": true  // 선택, 기본값: true
+   * }
+   * 
+   * 응답:
+   * {
+   *   "success": true,
+   *   "added": 2,        // 새로 추가된 파일
+   *   "updated": 3,      // 변경되어 재인덱싱된 파일
+   *   "skipped": 6,      // 변경 없어서 스킵된 파일
+   *   "deleted": 0,      // 삭제된 파일
+   *   "total": 11,       // 전체 파일 수
+   *   "message": "증분 인덱싱 완료: 추가 2개, 업데이트 3개, 스킵 6개"
+   * }
+   * 
+   * 파일 해시를 비교하여 변경된 파일만 재인덱싱합니다.
+   * 이전에 인덱싱된 파일은 스킵하여 시간과 비용을 절약합니다.
+   */
+  @Post('incremental-index')
+  async incrementalIndex(
+    @Body() body: { dirPath: string; recursive?: boolean },
+  ) {
+    try {
+      const recursive = body.recursive !== undefined ? body.recursive : true;
+      const result = await this.ragService.incrementalIndexDirectory(
+        body.dirPath,
+        recursive,
+      );
+
+      return {
+        success: true,
+        ...result,
+        message: `증분 인덱싱 완료: 추가 ${result.added}개, 업데이트 ${result.updated}개, 스킵 ${result.skipped}개`,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * 인덱싱 통계 조회
+   * 
+   * GET /rag/stats
+   * 
+   * 응답:
+   * {
+   *   "totalFiles": 11,
+   *   "totalChunks": 204,
+   *   "lastIndexedAt": "2024-12-14T08:30:00.000Z"
+   * }
+   */
+  @Get('stats')
+  async getStats() {
+    try {
+      const stats = this.ragService.getIndexingStats();
+      return {
+        success: true,
+        ...stats,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * 인덱싱 히스토리 초기화
+   * 
+   * POST /rag/reset-history
+   * 
+   * 인덱싱 히스토리를 모두 삭제합니다.
+   * 다음 증분 인덱싱 시 모든 파일이 새로 추가됩니다.
+   */
+  @Post('reset-history')
+  async resetHistory() {
+    try {
+      this.ragService.clearIndexingHistory();
+      return {
+        success: true,
+        message: '인덱싱 히스토리가 초기화되었습니다.',
       };
     } catch (error) {
       return {

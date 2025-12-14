@@ -1,265 +1,236 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# RAG Study Project
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS 기반 RAG (Retrieval-Augmented Generation) 시스템
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 주요 기능
 
-## Description
+- 📄 **다양한 문서 형식 지원**: JSON, PDF, TXT, MD, DOCX
+- 🔍 **벡터 검색**: Qdrant를 사용한 고성능 벡터 검색
+- 🤖 **LLM 답변 생성**: OpenAI GPT를 활용한 구조화된 답변
+- 🎯 **Re-ranking**: 회사별 필터링으로 정확한 검색 결과
+- ⚡ **증분 업데이트**: 변경된 파일만 재인덱싱하여 비용 절감
 
-LangChain을 활용한 RAG(Retrieval-Augmented Generation) 시스템을 구축한 NestJS 프로젝트입니다.
+## 빠른 시작
 
-## 아키텍처
-
-### 시스템 아키텍처 다이어그램
-
-```mermaid
-graph TB
-    Client[클라이언트] -->|HTTP 요청| NestJS[NestJS 애플리케이션]
-
-    NestJS --> RagController[RAG Controller]
-    RagController --> RagService[RAG Service]
-
-    RagService --> TextSplitter[Text Splitter<br/>RecursiveCharacterTextSplitter]
-    RagService --> Embeddings[OpenAI Embeddings<br/>text-embedding-ada-002]
-    RagService --> LLM[ChatOpenAI<br/>gpt-3.5-turbo]
-    RagService --> VectorStore[QdrantVectorStore]
-
-    TextSplitter -->|문서 분할| Documents[Document 청크들]
-    Documents --> Embeddings
-    Embeddings -->|벡터 변환| VectorStore
-
-    VectorStore -->|벡터 저장/검색| Qdrant[Qdrant 벡터 DB<br/>localhost:6333]
-
-    Qdrant -->|유사 문서 검색| Retriever[Retriever]
-    Retriever -->|컨텍스트| PromptTemplate[Prompt Template]
-    PromptTemplate --> LLM
-    LLM -->|답변 생성| Client
-
-    style NestJS fill:#e1f5ff
-    style RagService fill:#fff4e1
-    style Qdrant fill:#e8f5e9
-    style LLM fill:#fce4ec
-    style Embeddings fill:#fce4ec
-```
-
-### RAG 워크플로우
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Controller
-    participant Service
-    participant TextSplitter
-    participant Embeddings
-    participant Qdrant
-    participant LLM
-
-    Note over Client,LLM: 문서 추가 프로세스
-    Client->>Controller: POST /rag/documents
-    Controller->>Service: addDocuments(texts)
-    Service->>TextSplitter: splitDocuments()
-    TextSplitter-->>Service: Document 청크들
-    Service->>Embeddings: embedDocuments()
-    Embeddings-->>Service: 벡터 배열
-    Service->>Qdrant: upsert(vectors, documents)
-    Qdrant-->>Service: 성공
-    Service-->>Controller: 완료
-    Controller-->>Client: 성공 응답
-
-    Note over Client,LLM: 질의응답 프로세스
-    Client->>Controller: POST /rag/query
-    Controller->>Service: query(question)
-    Service->>Embeddings: embedQuery(question)
-    Embeddings-->>Service: 질문 벡터
-    Service->>Qdrant: search(query_vector)
-    Qdrant-->>Service: 유사 문서들
-    Service->>LLM: invoke(prompt + context)
-    LLM-->>Service: 답변
-    Service-->>Controller: answer + sources
-    Controller-->>Client: JSON 응답
-```
-
-자세한 아키텍처 문서는 [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)를 참고하세요.
-
-## 문서
-
-- [아키텍처 문서](./docs/ARCHITECTURE.md) - 시스템 아키텍처 및 설계 상세 설명
-- [API 문서](./docs/API.md) - REST API 엔드포인트 상세 가이드
-- [컴포넌트 문서](./docs/COMPONENTS.md) - 각 컴포넌트의 상세 설명 및 코드 예제
-
-## RAG 시스템 사용 가이드
-
-### 1. Qdrant 서버 실행
-
-Qdrant는 벡터 데이터베이스 서버입니다. Docker를 사용하여 실행할 수 있습니다:
+### 1. 설치
 
 ```bash
-docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
+pnpm install
 ```
-
-또는 Qdrant Cloud를 사용할 수 있습니다.
 
 ### 2. 환경 변수 설정
 
-프로젝트 루트에 `.env` 파일을 생성하고 필요한 환경 변수를 설정하세요:
+`.env` 파일 생성:
 
 ```env
-# OpenAI API 키 (필수)
 OPENAI_API_KEY=your_openai_api_key_here
-
-# Qdrant 설정 (선택, 기본값: http://localhost:6333)
 QDRANT_URL=http://localhost:6333
-QDRANT_API_KEY=your_qdrant_api_key_here  # Qdrant Cloud 사용 시 필요
-QDRANT_COLLECTION_NAME=rag-documents      # 컬렉션 이름 (기본값: rag-documents)
-
-# 서버 포트 (선택, 기본값: 3000)
-PORT=3000
 ```
 
-### 3. 문서 추가
-
-#### 방법 1: 텍스트 배열로 추가
+### 3. Qdrant 실행
 
 ```bash
-POST http://localhost:3000/rag/documents
-Content-Type: application/json
-
-{
-  "texts": [
-    "문서 내용 1",
-    "문서 내용 2"
-  ]
-}
+docker run -p 6333:6333 qdrant/qdrant
 ```
 
-#### 방법 2: 파일 업로드
+### 4. 문서 인덱싱
 
 ```bash
-POST http://localhost:3000/rag/upload
-Content-Type: multipart/form-data
+# 첫 인덱싱 (전체)
+pnpm run index-docs
 
-file: [파일 선택]
+# 또는 증분 인덱싱 (변경된 파일만)
+pnpm run index-incremental
 ```
 
-### 4. 질문하기
+### 5. 서버 실행
 
 ```bash
-POST http://localhost:3000/rag/query
-Content-Type: application/json
-
-{
-  "question": "질문 내용"
-}
+pnpm run start:dev
 ```
 
-### 5. 유사 문서 검색
+### 6. 쿼리 테스트
 
 ```bash
-GET http://localhost:3000/rag/search?q=검색어&k=4
+curl -X POST http://localhost:3000/rag/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "쿠팡의 개인정보 보호책임자는 누구인가요?"
+  }'
 ```
 
-### 주요 기능
+## 사용 가이드
 
-- **문서 로딩**: 텍스트 문서를 벡터 스토어에 추가
-- **텍스트 분할**: 문서를 적절한 크기의 청크로 분할
-- **벡터 임베딩**: OpenAI 임베딩 모델을 사용하여 텍스트를 벡터로 변환
-- **벡터 검색**: Qdrant를 사용한 유사 문서 검색
-- **RAG 체인**: 검색된 문서를 컨텍스트로 사용하여 LLM이 답변 생성
+- [인덱싱 가이드](./INDEXING_GUIDE.md) - 문서 인덱싱 방법
+- [증분 인덱싱 가이드](./INCREMENTAL_INDEXING_GUIDE.md) - 증분 업데이트
+- [쿼리 가이드](./QUERY_GUIDE.md) - RAG 쿼리 사용법
 
-### 벡터 데이터베이스: Qdrant
+## API 엔드포인트
 
-이 프로젝트는 Qdrant를 벡터 데이터베이스로 사용합니다:
+### POST /rag/query
 
-- **로컬 실행**: Docker를 사용하여 로컬에서 실행 가능
-- **클라우드**: Qdrant Cloud를 사용하여 관리형 서비스 이용 가능
-- **확장성**: 대규모 벡터 데이터 처리에 최적화
-- **성능**: 빠른 유사도 검색 및 실시간 업데이트 지원
-
-## Project setup
+질문에 답변
 
 ```bash
-$ pnpm install
+curl -X POST http://localhost:3000/rag/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "비밀번호 정책은?"}'
 ```
 
-## Compile and run the project
+### POST /rag/incremental-index
+
+증분 인덱싱
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+curl -X POST http://localhost:3000/rag/incremental-index \
+  -H "Content-Type: application/json" \
+  -d '{"dirPath": "rag-docs", "recursive": true}'
 ```
 
-## Run tests
+### GET /rag/stats
+
+인덱싱 통계 조회
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+curl http://localhost:3000/rag/stats
 ```
 
-## Deployment
+## 프로젝트 구조
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```
+src/
+├── rag/
+│   ├── controllers/       # API 컨트롤러
+│   ├── services/          # 비즈니스 로직
+│   │   ├── rag.service.ts           # RAG 파이프라인
+│   │   ├── embedding.service.ts     # 임베딩 생성
+│   │   ├── chunking.service.ts      # 텍스트 분할
+│   │   ├── vector-store.service.ts  # 벡터 스토어 관리
+│   │   ├── document-loader.service.ts # 문서 로드
+│   │   ├── llm.service.ts           # LLM 답변 생성
+│   │   └── indexing-history.service.ts # 인덱싱 히스토리
+│   ├── stores/            # 벡터 스토어 구현
+│   │   └── qdrant-vector-store.ts
+│   ├── utils/             # 유틸리티
+│   │   └── file-hash.util.ts
+│   └── rag.module.ts
+├── app.module.ts
+└── main.ts
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+scripts/
+├── index-rag-docs.ts      # 전체 인덱싱 스크립트
+└── incremental-index.ts   # 증분 인덱싱 스크립트
+
+ai-logs/                   # 작업 로그 (학습용)
+├── 1-필요한-LangChain-패키지-설치.md
+├── 2-RAG-모듈-및-서비스-생성.md
+├── ...
+└── 12-증분-업데이트-구현.md
+```
+
+## 기술 스택
+
+- **프레임워크**: NestJS
+- **언어**: TypeScript
+- **벡터 DB**: Qdrant
+- **LLM**: OpenAI GPT-3.5/4
+- **RAG 프레임워크**: LangChain
+
+## 주요 개념
+
+### RAG (Retrieval-Augmented Generation)
+
+1. **문서 인덱싱**: 문서를 청크로 분할 → 임베딩 생성 → 벡터 DB 저장
+2. **검색**: 질문을 임베딩 → 벡터 유사도 검색
+3. **답변 생성**: 검색된 문서 + 질문 → LLM에 전달 → 답변 생성
+
+### 증분 업데이트
+
+- 파일 해시로 변경 감지
+- 변경된 파일만 재인덱싱
+- **비용 절감**: 최대 100% (변경 없을 때)
+- **시간 절약**: 2초 vs 30초
+
+### Re-ranking
+
+- 벡터 검색 후 메타데이터 필터링
+- 회사명으로 문서 필터링
+- 정확도 향상
+
+## 성능
+
+| 지표                    | 값     |
+| ----------------------- | ------ |
+| 문서 수                 | 11개   |
+| 청크 수                 | ~204개 |
+| 평균 응답 시간          | ~3초   |
+| 증분 인덱싱 (변경 없음) | ~2초   |
+| 증분 인덱싱 (1개 변경)  | ~5초   |
+
+## 비용
+
+| 작업             | OpenAI API 호출            | 비용 (예상) |
+| ---------------- | -------------------------- | ----------- |
+| 전체 인덱싱      | ~204 embeddings            | $0.02       |
+| 증분 (변경 없음) | 0                          | $0          |
+| 증분 (1개 변경)  | ~18 embeddings             | $0.002      |
+| 쿼리 1회         | 1 embedding + 1 completion | $0.001      |
+
+## 작업 로그
+
+모든 작업은 `ai-logs/` 폴더에 상세히 기록되어 있습니다:
+
+1. [LangChain 패키지 설치](./ai-logs/1-필요한-LangChain-패키지-설치.md)
+2. [RAG 모듈 및 서비스 생성](./ai-logs/2-RAG-모듈-및-서비스-생성.md)
+3. [DocumentLoader 구성](./ai-logs/3-DocumentLoader-구성.md)
+4. [TextSplitter 구성](./ai-logs/4-TextSplitter-구성.md)
+5. [VectorStore 및 Embedding 설정](./ai-logs/5-VectorStore-및-Embedding-설정.md)
+6. [LLM 및 RAG Chain 구성](./ai-logs/6-LLM-및-RAG-Chain-구성.md)
+7. [빌드 오류 수정](./ai-logs/7-빌드-오류-수정.md)
+8. [FAISS에서 Qdrant로 벡터 DB 변경](./ai-logs/8-FAISS에서-Qdrant로-벡터-DB-변경.md)
+9. [문서 인덱싱 시스템 구축](./ai-logs/9-문서-인덱싱-시스템-구축.md)
+10. [프롬프트 엔지니어링 개선](./ai-logs/10-프롬프트-엔지니어링-개선.md)
+11. [Re-ranking 회사별 필터링 구현](./ai-logs/11-Re-ranking-회사별-필터링-구현.md)
+12. [증분 업데이트 구현](./ai-logs/12-증분-업데이트-구현.md)
+
+## 개발
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# 개발 서버
+pnpm run start:dev
+
+# 빌드
+pnpm run build
+
+# 프로덕션 실행
+pnpm run start:prod
+
+# 테스트
+pnpm run test
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 테스트 스크립트
 
-## Resources
+```bash
+# 쿼리 테스트
+./test-query.sh
 
-Check out a few resources that may come in handy when working with NestJS:
+# Re-ranking 테스트
+./test-rerank.sh
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# 증분 인덱싱 테스트
+./test-incremental.sh
+```
 
-## Support
+## 라이선스
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+MIT
 
-## Stay in touch
+## 문의
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+프로젝트에 대한 질문이나 제안사항이 있으시면 이슈를 등록해주세요.
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**제작**: RAG Study Project  
+**목적**: LangChain + NestJS + Qdrant를 활용한 프로덕션급 RAG 시스템 구축

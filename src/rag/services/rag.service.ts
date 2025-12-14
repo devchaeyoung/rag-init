@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Document } from '@langchain/core/documents';
 import { ChunkingService } from './chunking.service';
 import { VectorStoreService } from './vector-store.service';
 import { DocumentLoaderService } from './document-loader.service';
 import { LLMService } from './llm.service';
+import { IndexingHistoryService } from './indexing-history.service';
+import { FileHashUtil } from '../utils/file-hash.util';
 
 /**
  * RAG (Retrieval-Augmented Generation) 서비스
@@ -14,11 +16,14 @@ import { LLMService } from './llm.service';
  */
 @Injectable()
 export class RagService {
+  private readonly logger = new Logger(RagService.name);
+
   constructor(
     private readonly chunkingService: ChunkingService,
     private readonly vectorStoreService: VectorStoreService,
     private readonly documentLoaderService: DocumentLoaderService,
     private readonly llmService: LLMService,
+    private readonly indexingHistoryService: IndexingHistoryService,
   ) {}
 
   /**
@@ -83,6 +88,146 @@ export class RagService {
     await this.addDocuments(texts, metadata);
 
     return documents.length;
+  }
+
+  /**
+   * 디렉토리의 파일을 증분 업데이트 (변경된 파일만 재인덱싱)
+   *
+   * @param dirPath - 디렉토리 경로
+   * @param recursive - 하위 디렉토리 포함 여부 (기본값: true)
+   * @returns 처리 결과 (추가, 업데이트, 삭제된 파일 수)
+   */
+  async incrementalIndexDirectory(
+    dirPath: string,
+    recursive = true,
+  ): Promise<{
+    added: number;
+    updated: number;
+    deleted: number;
+    skipped: number;
+    total: number;
+  }> {
+    this.logger.log(`📂 증분 인덱싱 시작: ${dirPath}`);
+
+    let added = 0;
+    let updated = 0;
+    let skipped = 0;
+
+    // 1. 디렉토리의 모든 파일 가져오기
+    const documents = await this.documentLoaderService.loadFromDirectory(
+      dirPath,
+      recursive,
+    );
+
+    this.logger.log(`📄 발견된 파일: ${documents.length}개`);
+
+    // 2. 각 파일 처리
+    for (const doc of documents) {
+      const filePath = doc.metadata.filePath;
+      
+      try {
+        // 파일 해시 계산
+        const fileInfo = FileHashUtil.getFileInfo(filePath);
+        
+        // 기존 인덱싱 기록 확인
+        if (this.indexingHistoryService.isIndexed(filePath)) {
+          // 변경 여부 확인
+          if (this.indexingHistoryService.hasChanged(filePath, fileInfo.hash)) {
+            // 변경됨 → 재인덱싱
+            this.logger.log(`🔄 업데이트: ${doc.metadata.fileName}`);
+            await this.addDocuments([doc.content], [doc.metadata]);
+            
+            // 히스토리 업데이트
+            const chunkCount = await this.getChunkCount(doc.content);
+            this.indexingHistoryService.recordIndexing(
+              filePath,
+              fileInfo.hash,
+              fileInfo.modifiedTime,
+              chunkCount,
+            );
+            
+            updated++;
+          } else {
+            // 변경 없음 → 스킵
+            this.logger.log(`⏭️  스킵: ${doc.metadata.fileName} (변경 없음)`);
+            skipped++;
+          }
+        } else {
+          // 새 파일 → 추가
+          this.logger.log(`➕ 추가: ${doc.metadata.fileName}`);
+          await this.addDocuments([doc.content], [doc.metadata]);
+          
+          // 히스토리 기록
+          const chunkCount = await this.getChunkCount(doc.content);
+          this.indexingHistoryService.recordIndexing(
+            filePath,
+            fileInfo.hash,
+            fileInfo.modifiedTime,
+            chunkCount,
+          );
+          
+          added++;
+        }
+      } catch (error) {
+        this.logger.error(`❌ 처리 실패: ${doc.metadata.fileName}`, error.stack);
+      }
+    }
+
+    // 3. 삭제된 파일 감지
+    const deletedFiles = this.indexingHistoryService.findDeletedFiles();
+    const deleted = deletedFiles.length;
+
+    if (deleted > 0) {
+      this.logger.log(`🗑️  삭제된 파일 감지: ${deleted}개`);
+      for (const filePath of deletedFiles) {
+        // 히스토리에서 제거
+        this.indexingHistoryService.removeRecord(filePath);
+        this.logger.log(`  - ${filePath}`);
+      }
+      
+      this.logger.warn('⚠️  벡터 DB에서 삭제된 파일의 청크를 수동으로 제거해야 합니다.');
+    }
+
+    // 4. 결과 요약
+    const total = added + updated + skipped;
+    
+    this.logger.log('');
+    this.logger.log('📊 증분 인덱싱 완료');
+    this.logger.log(`  ➕ 추가: ${added}개`);
+    this.logger.log(`  🔄 업데이트: ${updated}개`);
+    this.logger.log(`  ⏭️  스킵: ${skipped}개`);
+    this.logger.log(`  🗑️  삭제: ${deleted}개`);
+    this.logger.log(`  📈 전체: ${total}개`);
+
+    return {
+      added,
+      updated,
+      deleted,
+      skipped,
+      total,
+    };
+  }
+
+  /**
+   * 텍스트의 청크 개수 계산 (헬퍼)
+   */
+  private async getChunkCount(text: string): Promise<number> {
+    const docs = await this.chunkingService.splitTexts([text]);
+    return docs.length;
+  }
+
+  /**
+   * 인덱싱 통계 조회
+   */
+  getIndexingStats() {
+    return this.indexingHistoryService.getStats();
+  }
+
+  /**
+   * 인덱싱 히스토리 초기화
+   */
+  clearIndexingHistory(): void {
+    this.indexingHistoryService.clearHistory();
   }
 
   /**
