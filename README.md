@@ -23,7 +23,174 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+LangChain을 활용한 RAG(Retrieval-Augmented Generation) 시스템을 구축한 NestJS 프로젝트입니다.
+
+## 아키텍처
+
+### 시스템 아키텍처 다이어그램
+
+```mermaid
+graph TB
+    Client[클라이언트] -->|HTTP 요청| NestJS[NestJS 애플리케이션]
+
+    NestJS --> RagController[RAG Controller]
+    RagController --> RagService[RAG Service]
+
+    RagService --> TextSplitter[Text Splitter<br/>RecursiveCharacterTextSplitter]
+    RagService --> Embeddings[OpenAI Embeddings<br/>text-embedding-ada-002]
+    RagService --> LLM[ChatOpenAI<br/>gpt-3.5-turbo]
+    RagService --> VectorStore[QdrantVectorStore]
+
+    TextSplitter -->|문서 분할| Documents[Document 청크들]
+    Documents --> Embeddings
+    Embeddings -->|벡터 변환| VectorStore
+
+    VectorStore -->|벡터 저장/검색| Qdrant[Qdrant 벡터 DB<br/>localhost:6333]
+
+    Qdrant -->|유사 문서 검색| Retriever[Retriever]
+    Retriever -->|컨텍스트| PromptTemplate[Prompt Template]
+    PromptTemplate --> LLM
+    LLM -->|답변 생성| Client
+
+    style NestJS fill:#e1f5ff
+    style RagService fill:#fff4e1
+    style Qdrant fill:#e8f5e9
+    style LLM fill:#fce4ec
+    style Embeddings fill:#fce4ec
+```
+
+### RAG 워크플로우
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant TextSplitter
+    participant Embeddings
+    participant Qdrant
+    participant LLM
+
+    Note over Client,LLM: 문서 추가 프로세스
+    Client->>Controller: POST /rag/documents
+    Controller->>Service: addDocuments(texts)
+    Service->>TextSplitter: splitDocuments()
+    TextSplitter-->>Service: Document 청크들
+    Service->>Embeddings: embedDocuments()
+    Embeddings-->>Service: 벡터 배열
+    Service->>Qdrant: upsert(vectors, documents)
+    Qdrant-->>Service: 성공
+    Service-->>Controller: 완료
+    Controller-->>Client: 성공 응답
+
+    Note over Client,LLM: 질의응답 프로세스
+    Client->>Controller: POST /rag/query
+    Controller->>Service: query(question)
+    Service->>Embeddings: embedQuery(question)
+    Embeddings-->>Service: 질문 벡터
+    Service->>Qdrant: search(query_vector)
+    Qdrant-->>Service: 유사 문서들
+    Service->>LLM: invoke(prompt + context)
+    LLM-->>Service: 답변
+    Service-->>Controller: answer + sources
+    Controller-->>Client: JSON 응답
+```
+
+자세한 아키텍처 문서는 [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)를 참고하세요.
+
+## 문서
+
+- [아키텍처 문서](./docs/ARCHITECTURE.md) - 시스템 아키텍처 및 설계 상세 설명
+- [API 문서](./docs/API.md) - REST API 엔드포인트 상세 가이드
+- [컴포넌트 문서](./docs/COMPONENTS.md) - 각 컴포넌트의 상세 설명 및 코드 예제
+
+## RAG 시스템 사용 가이드
+
+### 1. Qdrant 서버 실행
+
+Qdrant는 벡터 데이터베이스 서버입니다. Docker를 사용하여 실행할 수 있습니다:
+
+```bash
+docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
+```
+
+또는 Qdrant Cloud를 사용할 수 있습니다.
+
+### 2. 환경 변수 설정
+
+프로젝트 루트에 `.env` 파일을 생성하고 필요한 환경 변수를 설정하세요:
+
+```env
+# OpenAI API 키 (필수)
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Qdrant 설정 (선택, 기본값: http://localhost:6333)
+QDRANT_URL=http://localhost:6333
+QDRANT_API_KEY=your_qdrant_api_key_here  # Qdrant Cloud 사용 시 필요
+QDRANT_COLLECTION_NAME=rag-documents      # 컬렉션 이름 (기본값: rag-documents)
+
+# 서버 포트 (선택, 기본값: 3000)
+PORT=3000
+```
+
+### 3. 문서 추가
+
+#### 방법 1: 텍스트 배열로 추가
+
+```bash
+POST http://localhost:3000/rag/documents
+Content-Type: application/json
+
+{
+  "texts": [
+    "문서 내용 1",
+    "문서 내용 2"
+  ]
+}
+```
+
+#### 방법 2: 파일 업로드
+
+```bash
+POST http://localhost:3000/rag/upload
+Content-Type: multipart/form-data
+
+file: [파일 선택]
+```
+
+### 4. 질문하기
+
+```bash
+POST http://localhost:3000/rag/query
+Content-Type: application/json
+
+{
+  "question": "질문 내용"
+}
+```
+
+### 5. 유사 문서 검색
+
+```bash
+GET http://localhost:3000/rag/search?q=검색어&k=4
+```
+
+### 주요 기능
+
+- **문서 로딩**: 텍스트 문서를 벡터 스토어에 추가
+- **텍스트 분할**: 문서를 적절한 크기의 청크로 분할
+- **벡터 임베딩**: OpenAI 임베딩 모델을 사용하여 텍스트를 벡터로 변환
+- **벡터 검색**: Qdrant를 사용한 유사 문서 검색
+- **RAG 체인**: 검색된 문서를 컨텍스트로 사용하여 LLM이 답변 생성
+
+### 벡터 데이터베이스: Qdrant
+
+이 프로젝트는 Qdrant를 벡터 데이터베이스로 사용합니다:
+
+- **로컬 실행**: Docker를 사용하여 로컬에서 실행 가능
+- **클라우드**: Qdrant Cloud를 사용하여 관리형 서비스 이용 가능
+- **확장성**: 대규모 벡터 데이터 처리에 최적화
+- **성능**: 빠른 유사도 검색 및 실시간 업데이트 지원
 
 ## Project setup
 
