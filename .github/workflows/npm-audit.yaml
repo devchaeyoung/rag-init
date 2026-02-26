@@ -24,60 +24,171 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Run npm audit
+      - name: Run npm audit (JSON)
         id: audit
         run: |
           set +e
-          AUDIT_OUTPUT=$(npm audit 2>&1)
-          AUDIT_EXIT=$?
+          npm audit --json > /tmp/audit.json 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
           set -e
 
-          echo "exit_code=$AUDIT_EXIT" >> "$GITHUB_OUTPUT"
+      - name: Generate report
+        id: report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const raw = fs.readFileSync('/tmp/audit.json', 'utf8');
+            let audit;
+            try {
+              audit = JSON.parse(raw);
+            } catch {
+              core.setOutput('body', '## npm audit 보고서\n\n⚠️ JSON 파싱 실패\n\n```\n' + raw.slice(0, 3000) + '\n```');
+              return;
+            }
 
-          {
-            echo 'report<<EOF'
-            echo "$AUDIT_OUTPUT"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+            const meta = audit.metadata?.vulnerabilities || {};
+            const total = meta.total || 0;
+            const counts = {
+              critical: meta.critical || 0,
+              high: meta.high || 0,
+              moderate: meta.moderate || 0,
+              low: meta.low || 0,
+              info: meta.info || 0,
+            };
+
+            const badge = {
+              critical: '🔴',
+              high: '🟠',
+              moderate: '🟡',
+              low: '🔵',
+              info: '⚪',
+            };
+
+            // 상태 헤더
+            const status = total === 0
+              ? '✅ 취약점이 발견되지 않았습니다.'
+              : `⚠️ **${total}건**의 취약점이 발견되었습니다.`;
+
+            // 요약 테이블
+            const summaryRows = Object.entries(counts)
+              .filter(([, v]) => v > 0)
+              .map(([k, v]) => `| ${badge[k]} ${k.charAt(0).toUpperCase() + k.slice(1)} | **${v}**건 |`);
+
+            // 취약점 상세 테이블
+            const vulns = audit.vulnerabilities || {};
+            const detailRows = [];
+
+            for (const [name, info] of Object.entries(vulns)) {
+              const severity = info.severity || 'info';
+              const icon = badge[severity] || '⚪';
+              const range = info.range || '-';
+
+              // via에서 advisory 제목 추출
+              let title = '-';
+              let url = '';
+              if (Array.isArray(info.via)) {
+                const advisory = info.via.find(v => typeof v === 'object' && v.title);
+                if (advisory) {
+                  title = advisory.title;
+                  url = advisory.url || '';
+                }
+              }
+
+              const titleCell = url ? `[${title}](${url})` : title;
+
+              // 수정 가능 여부
+              let fix = '❌ 수정 불가';
+              if (info.fixAvailable === true) {
+                fix = '✅ `npm audit fix`';
+              } else if (typeof info.fixAvailable === 'object') {
+                const breaking = info.fixAvailable.name;
+                const ver = info.fixAvailable.version;
+                fix = `⚠️ \`--force\` (${breaking}@${ver})`;
+              }
+
+              // isDirect 여부
+              const dep = info.isDirect ? '직접' : '간접';
+
+              detailRows.push(`| ${icon} ${severity} | \`${name}\` (${range}) | ${titleCell} | ${dep} | ${fix} |`);
+            }
+
+            // 정렬: critical > high > moderate > low > info
+            const order = { critical: 0, high: 1, moderate: 2, low: 3, info: 4 };
+            detailRows.sort((a, b) => {
+              const sa = Object.keys(order).find(k => a.includes(k)) || 'info';
+              const sb = Object.keys(order).find(k => b.includes(k)) || 'info';
+              return (order[sa] || 4) - (order[sb] || 4);
+            });
+
+            // 권장 조치 집계
+            let fixable = 0;
+            let breaking = 0;
+            let nofix = 0;
+            for (const info of Object.values(vulns)) {
+              if (info.fixAvailable === true) fixable++;
+              else if (typeof info.fixAvailable === 'object') breaking++;
+              else nofix++;
+            }
+
+            // 의존성 정보
+            const deps = audit.metadata?.dependencies || {};
+            const depInfo = `전체 ${deps.total || '-'}개 패키지 (prod: ${deps.prod || '-'}, dev: ${deps.dev || '-'})`;
+
+            // 마크다운 조합
+            const lines = [
+              `## 🔍 npm audit 보고서`,
+              ``,
+              status,
+              ``,
+              `### 📊 요약`,
+              ``,
+              `| 심각도 | 건수 |`,
+              `|--------|------|`,
+              ...summaryRows,
+              ``,
+              `> 📦 ${depInfo}`,
+            ];
+
+            if (detailRows.length > 0) {
+              lines.push(
+                ``,
+                `### 📋 취약점 상세`,
+                ``,
+                `| 심각도 | 패키지 | 취약점 | 의존성 | 수정 가능 |`,
+                `|--------|--------|--------|--------|-----------|`,
+                ...detailRows,
+              );
+            }
+
+            if (total > 0) {
+              lines.push(
+                ``,
+                `### 💡 권장 조치`,
+                ``,
+              );
+              if (fixable > 0) lines.push(`- ✅ \`npm audit fix\`로 해결 가능: **${fixable}건**`);
+              if (breaking > 0) lines.push(`- ⚠️ Breaking change 수반 (\`npm audit fix --force\`): **${breaking}건**`);
+              if (nofix > 0) lines.push(`- ❌ 자동 수정 불가: **${nofix}건**`);
+            }
+
+            lines.push(``, `> 🤖 자동 생성된 보고서입니다.`);
+
+            const body = lines.join('\n');
+            core.setOutput('body', body);
 
       - name: Write summary
         run: |
-          EXIT_CODE="${{ steps.audit.outputs.exit_code }}"
-          if [ "$EXIT_CODE" = "0" ]; then
-            STATUS="✅ 취약점 없음"
-          else
-            STATUS="⚠️ 취약점 발견"
-          fi
-
-          echo "## npm audit 보고서" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**상태**: $STATUS" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.audit.outputs.report }}" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat << 'SUMMARY_EOF' >> $GITHUB_STEP_SUMMARY
+          ${{ steps.report.outputs.body }}
+          SUMMARY_EOF
 
       - name: Comment PR with audit report
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
-            const exitCode = '${{ steps.audit.outputs.exit_code }}';
-            const report = `${{ steps.audit.outputs.report }}`;
-
-            const status = exitCode === '0' ? '✅ 취약점 없음' : '⚠️ 취약점 발견';
-            const body = [
-              `## npm audit 보고서`,
-              ``,
-              `**상태**: ${status}`,
-              ``,
-              '```',
-              report,
-              '```',
-              ``,
-              `> 자동 생성된 보고서입니다.`
-            ].join('\n');
-
+            const body = `${{ steps.report.outputs.body }}`;
             const prNumber = context.payload.pull_request.number;
 
             const { data: comments } = await github.rest.issues.listComments({
@@ -87,7 +198,7 @@ jobs:
             });
 
             const existing = comments.find(c =>
-              c.user.type === 'Bot' && c.body.includes('## npm audit 보고서')
+              c.user.type === 'Bot' && c.body.includes('## 🔍 npm audit 보고서')
             );
 
             if (existing) {
