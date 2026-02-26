@@ -1,0 +1,107 @@
+name: npm audit
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Run npm audit
+        id: audit
+        run: |
+          set +e
+          AUDIT_OUTPUT=$(npm audit 2>&1)
+          AUDIT_EXIT=$?
+          set -e
+
+          echo "exit_code=$AUDIT_EXIT" >> "$GITHUB_OUTPUT"
+
+          {
+            echo 'report<<EOF'
+            echo "$AUDIT_OUTPUT"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Write summary
+        run: |
+          EXIT_CODE="${{ steps.audit.outputs.exit_code }}"
+          if [ "$EXIT_CODE" = "0" ]; then
+            STATUS="✅ 취약점 없음"
+          else
+            STATUS="⚠️ 취약점 발견"
+          fi
+
+          echo "## npm audit 보고서" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**상태**: $STATUS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.audit.outputs.report }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment PR with audit report
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const exitCode = '${{ steps.audit.outputs.exit_code }}';
+            const report = `${{ steps.audit.outputs.report }}`;
+
+            const status = exitCode === '0' ? '✅ 취약점 없음' : '⚠️ 취약점 발견';
+            const body = [
+              `## npm audit 보고서`,
+              ``,
+              `**상태**: ${status}`,
+              ``,
+              '```',
+              report,
+              '```',
+              ``,
+              `> 자동 생성된 보고서입니다.`
+            ].join('\n');
+
+            const prNumber = context.payload.pull_request.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('## npm audit 보고서')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
