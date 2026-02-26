@@ -8,11 +8,13 @@ on:
       - 'package.json'
       - 'package-lock.json'
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   audit:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +46,7 @@ jobs:
               audit = JSON.parse(raw);
             } catch {
               core.setOutput('body', '## npm audit 보고서\n\n⚠️ JSON 파싱 실패\n\n```\n' + raw.slice(0, 3000) + '\n```');
+              core.setOutput('total', '0');
               return;
             }
 
@@ -176,6 +179,10 @@ jobs:
 
             const body = lines.join('\n');
             core.setOutput('body', body);
+            core.setOutput('total', String(total));
+
+            // audit-report.md 파일로도 저장
+            fs.writeFileSync('audit-report.md', body);
 
       - name: Write summary
         run: |
@@ -183,6 +190,87 @@ jobs:
           ${{ steps.report.outputs.body }}
           SUMMARY_EOF
 
+      # workflow_dispatch: 취약점 발견 시 PR 생성
+      - name: Create audit PR
+        if: github.event_name == 'workflow_dispatch' && steps.report.outputs.total != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const today = new Date().toISOString().slice(0, 10);
+            const branch = `audit/${today}`;
+
+            // git 설정
+            execSync('git config user.name "github-actions[bot]"');
+            execSync('git config user.email "github-actions[bot]@users.noreply.github.com"');
+
+            // 기존 브랜치 정리 후 생성
+            try { execSync(`git push origin --delete ${branch}`, { stdio: 'ignore' }); } catch {}
+            execSync(`git checkout -b ${branch}`);
+            execSync('git add audit-report.md');
+            execSync(`git commit -m "docs: npm audit 보고서 (${today})"`);
+            execSync(`git push origin ${branch}`);
+
+            const body = `${{ steps.report.outputs.body }}`;
+
+            // 기존 audit PR이 열려있으면 닫기
+            const { data: openPrs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.repo.owner}:audit/`,
+            });
+
+            for (const pr of openPrs) {
+              if (pr.head.ref.startsWith('audit/')) {
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  state: 'closed',
+                });
+              }
+            }
+
+            // PR 생성
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔒 보안 취약점 점검 보고서 (${today})`,
+              body: body + '\n\n---\n\n> 이 PR은 `npm audit` 자동 점검으로 생성되었습니다.\n> Claude Code Review가 조치 계획서를 작성합니다.',
+              head: branch,
+              base: 'main',
+            });
+
+            // 라벨 자동 생성
+            for (const label of ['security', 'npm-audit']) {
+              try {
+                await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label });
+              } catch {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label,
+                  color: label === 'security' ? 'e11d48' : 'fbbc04',
+                });
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['security', 'npm-audit'],
+            });
+
+            core.notice(`PR 생성 완료: ${pr.html_url}`);
+
+      # workflow_dispatch: 취약점 없으면 알림만
+      - name: No vulnerabilities
+        if: github.event_name == 'workflow_dispatch' && steps.report.outputs.total == '0'
+        run: echo "✅ 취약점이 없어 PR을 생성하지 않습니다."
+
+      # pull_request: 기존처럼 PR 코멘트
       - name: Comment PR with audit report
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
